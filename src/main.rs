@@ -2,6 +2,8 @@ use std::fs::{self, File};
 use tracing::info;
 use tracing_subscriber::{filter::LevelFilter, fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
+use gaboemru::GameBoy;
+
 fn main() -> std::io::Result<()> {
     fs::create_dir_all("logs")?;
     let file = File::create("logs/emulator.log")?;
