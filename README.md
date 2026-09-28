@@ -79,8 +79,8 @@ reached. Status: ✅ done · 🚧 in progress · ⬜ planned.
 
 | Milestone               | Version | Scope                                   | Exit criterion                                          | Status |
 | ----------------------- | ------- | --------------------------------------- | ------------------------------------------------------- | :----: |
-| M0 — Foundations        | –       | Tooling, CI, logging, lib/bin split     | CI green on `main`                                      |   🚧   |
-| M1 — Cartridge & Bus    | v0.1.0  | ROM loading, header, memory map         | Header of a test ROM parsed                             |   ⬜   |
+| M0 — Foundations        | v0.0.0  | Tooling, CI, logging, lib/bin split     | CI green on `main`                                      |   ✅   |
+| M1 — Cartridge & Bus    | v0.1.0  | ROM loading, header, memory map         | Header of a test ROM parsed                             |   🚧   |
 | M2 — CPU                | v0.2.0  | Full instruction set, cycle counts      | All SingleStepTests/sm83 opcode files pass              |   ⬜   |
 | M3 — Interrupts & Timer | v0.3.0  | IME/IE/IF, timer, HALT, serial          | Interrupt, timer and HALT Mooneye ROMs in the allowlist |   ⬜   |
 | M4 — PPU                | v0.4.0  | LCD modes, BG, window, sprites, OAM DMA | `dmg-acid2` pixel-identical                             |   ⬜   |
@@ -97,7 +97,7 @@ reached. Status: ✅ done · 🚧 in progress · ⬜ planned.
 - [x] Library (`lib.rs`, emulation core) / binary (`main.rs`, glue) split
 - [x] CI: `cargo fmt --check`, `cargo clippy -- -D warnings`, `cargo test`
 - [x] Test ROM fetch script; `logs/`, `target/` and `tests/roms/` git-ignored
-- [ ] `CHANGELOG.md` ([Keep a Changelog](https://keepachangelog.com/) format)
+- [x] `CHANGELOG.md` ([Keep a Changelog](https://keepachangelog.com/) format)
 
 **Exit criterion**: CI passes on `main`.
 </details>
