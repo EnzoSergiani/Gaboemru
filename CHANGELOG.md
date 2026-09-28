@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- ROM selected via CLI.
+- common::types module with core type aliases (Byte).
 - Project scaffolding with a library/binary split: emulation core in `src/lib.rs` and its modules, CLI glue in `src/main.rs`.
 - `emulator` module with a minimal `GameBoy` struct.
 - Structured logging via `tracing`, written to `logs/emulator.log` and overwritten on every run.

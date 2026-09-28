@@ -105,7 +105,7 @@ reached. Status: ✅ done · 🚧 in progress · ⬜ planned.
 <details>
 <summary><b>M1 — Cartridge & Bus</b></summary>
 
-- [ ] ROM path as command-line argument
+- [x] ROM path as command-line argument
 - [ ] Parse the header (title, cartridge type, ROM/RAM size)
 - [ ] Verify the header checksum (`0x014D`)
 - [ ] `Mbc` trait with a ROM-only implementation
