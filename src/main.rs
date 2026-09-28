@@ -16,8 +16,10 @@ fn main() -> std::io::Result<()> {
         .with(fmt::layer().with_writer(file_writer).with_ansi(false))
         .init();
 
-    info!("Emulator started");
-    info!("Emulator ended");
+    info!("Program started");
+
+
+    info!("Program ended");
 
     Ok(())
 }

@@ -4,6 +4,14 @@ version = "0.1.0"
 edition = "2024"
 rust-version = "1.85.0"
 
+[lib]
+name = "gaboemru"
+path = "src/lib.rs"
+
+[[bin]]
+name = "gaboemru"
+path = "src/main.rs"
+
 [dependencies]
 tracing = "0.1.44"
 tracing-appender = "0.2.5"

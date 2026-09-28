@@ -94,9 +94,9 @@ reached. Status: ✅ done · 🚧 in progress · ⬜ planned.
 
 - [x] Project setup, Nix dev shell
 - [x] Logging with `tracing` (`logs/emulator.log`, overwritten on each run)
-- [ ] Library (`lib.rs`, emulation core) / binary (`main.rs`, glue) split
-- [ ] CI: `cargo fmt --check`, `cargo clippy -- -D warnings`, `cargo test`
-- [ ] Test ROM fetch script; `logs/`, `target/` and `tests/roms/` git-ignored
+- [x] Library (`lib.rs`, emulation core) / binary (`main.rs`, glue) split
+- [x] CI: `cargo fmt --check`, `cargo clippy -- -D warnings`, `cargo test`
+- [x] Test ROM fetch script; `logs/`, `target/` and `tests/roms/` git-ignored
 - [ ] `CHANGELOG.md` ([Keep a Changelog](https://keepachangelog.com/) format)
 
 **Exit criterion**: CI passes on `main`.
@@ -217,7 +217,10 @@ Built-in debugger · Save states · Boot ROM support (unlocks boot-dependent Moo
 
 ```
 src/
-└── main.rs        # Binary entry point
+├── common/
+├── emulator/
+├── lib.rs
+└── main.rs
 ```
 
 ### Planned structure
