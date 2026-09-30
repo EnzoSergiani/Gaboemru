@@ -218,6 +218,7 @@ Built-in debugger · Save states · Boot ROM support (unlocks boot-dependent Moo
 ```
 src/
 ├── bus/
+├── cartridge/
 ├── common/
 ├── emulator/
 ├── lib.rs
