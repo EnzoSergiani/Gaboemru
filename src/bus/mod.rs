@@ -20,6 +20,14 @@ impl Bus {
         trace!("Reading from address: {:#06X}", address);
         match address {
             0xC000..=0xDFFF => self.wram[(address - 0xC000) as usize],
+            0xE000..=0xFDFF => {
+                warn!("Prohibited range read at address: {:#06x}", address);
+                0xFF
+            }
+            0xFEA0..=0xFEFF => {
+                warn!("Prohibited range read at address: {:#06x}", address);
+                0xFF
+            }
             0xFF80..=0xFFFE => self.hram[(address - 0xFF80) as usize],
             _ => {
                 warn!("Out-of-range read at address: {:#06x}", address);
@@ -32,6 +40,18 @@ impl Bus {
         trace!("Writing {:#04X} to address: {:#06X}", value, address);
         match address {
             0xC000..=0xDFFF => self.wram[(address - 0xC000) as usize] = value,
+            0xE000..=0xFDFF => {
+                warn!(
+                    "Prohibited range write of {:#04X} at address: {:#06x}",
+                    value, address
+                );
+            }
+            0xFEA0..=0xFEFF => {
+                warn!(
+                    "Prohibited range write of {:#04X} at address: {:#06x}",
+                    value, address
+                );
+            }
             0xFF80..=0xFFFE => self.hram[(address - 0xFF80) as usize] = value,
             _ => {
                 warn!(
@@ -68,5 +88,11 @@ mod tests {
         let mut bus = Bus::new(minimal_rom());
         bus.write(0xFF80, 0xA0);
         assert_eq!(bus.read(0xFF80), 0xA0);
+    }
+
+    #[test]
+    fn prohibited_range_reads() {
+        let bus = Bus::new(minimal_rom());
+        assert_eq!(bus.read(0xFEB0), 0xFF);
     }
 }
