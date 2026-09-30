@@ -1,12 +1,16 @@
-use tracing::trace;
+use tracing::info;
 
-use crate::common::types::Byte;
+use crate::{bus::Bus, common::types::Byte};
 
-pub struct GameBoy {}
+pub struct GameBoy {
+    bus: Bus,
+}
 
 impl GameBoy {
-    pub fn new(_rom: Vec<Byte>) -> Self {
-        trace!("GameBoy created");
-        Self {}
+    pub fn new(rom: Vec<Byte>) -> Self {
+        let bus: Bus = Bus::new(rom);
+
+        info!("initialisation");
+        Self { bus }
     }
 }
