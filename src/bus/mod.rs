@@ -32,3 +32,17 @@ impl Bus {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn minimal_rom() -> Vec<Byte> {
+        let mut rom = vec![0u8; 0x150];
+        rom[0x0147] = 0x00;
+        let checksum =
+            (0x0134..=0x014C).fold(0u8, |acc, addr| acc.wrapping_sub(rom[addr]).wrapping_sub(1));
+        rom[0x014D] = checksum;
+        rom
+    }
+}
