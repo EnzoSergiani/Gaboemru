@@ -1,33 +1,16 @@
 mod header;
 mod mbc;
+mod rom_only;
 
 pub use header::CartridgeHeader;
 pub use mbc::Mbc;
 
 use tracing::{error, info, trace};
 
-use crate::common::types::{Address, Byte};
-
-pub struct MbcDefault {
-    rom: Vec<Byte>,
-}
-
-impl MbcDefault {
-    pub fn new(rom: Vec<Byte>) -> Self {
-        Self { rom }
-    }
-}
-
-impl Mbc for MbcDefault {
-    fn read_rom(&self, _address: Address) -> Byte {
-        0xFF
-    }
-    fn write_rom(&mut self, _addr: Address, _value: Byte) {}
-    fn read_ram(&self, _address: Address) -> Byte {
-        0xFF
-    }
-    fn write_ram(&mut self, _address: Address, _value: Byte) {}
-}
+use crate::{
+    cartridge::rom_only::RomOnly,
+    common::types::{Address, Byte},
+};
 
 pub struct Cartridge {
     header: CartridgeHeader,
@@ -37,7 +20,13 @@ pub struct Cartridge {
 impl Cartridge {
     pub fn new(rom: Vec<Byte>) -> Self {
         let header: CartridgeHeader = CartridgeHeader::parse(&rom);
-        let mbc: Box<dyn Mbc> = Box::new(MbcDefault::new(rom));
+        let mbc: Box<dyn Mbc> = match header.cartridge_type {
+            header::CartridgeType::RomOnly => Box::new(RomOnly::new(rom)),
+            _ => {
+                error!("Unsupported cartridge type: {:?}", header.cartridge_type);
+                panic!("Unsupported cartridge type: {:?}", header.cartridge_type);
+            }
+        };
 
         info!("initialisation");
         info!(
