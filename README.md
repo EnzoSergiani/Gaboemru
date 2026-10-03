@@ -80,8 +80,8 @@ reached. Status: ✅ done · 🚧 in progress · ⬜ planned.
 | Milestone               | Version | Scope                                   | Exit criterion                                          | Status |
 | ----------------------- | ------- | --------------------------------------- | ------------------------------------------------------- | :----: |
 | M0 — Foundations        | v0.0.0  | Tooling, CI, logging, lib/bin split     | CI green on `main`                                      |   ✅   |
-| M1 — Cartridge & Bus    | v0.1.0  | ROM loading, header, memory map         | Header of a test ROM parsed                             |   🚧   |
-| M2 — CPU                | v0.2.0  | Full instruction set, cycle counts      | All SingleStepTests/sm83 opcode files pass              |   ⬜   |
+| M1 — Cartridge & Bus    | v0.1.0  | ROM loading, header, memory map         | Header of a test ROM parsed                             |   ✅   |
+| M2 — CPU                | v0.2.0  | Full instruction set, cycle counts      | All SingleStepTests/sm83 opcode files pass              |   🚧   |
 | M3 — Interrupts & Timer | v0.3.0  | IME/IE/IF, timer, HALT, serial          | Interrupt, timer and HALT Mooneye ROMs in the allowlist |   ⬜   |
 | M4 — PPU                | v0.4.0  | LCD modes, BG, window, sprites, OAM DMA | `dmg-acid2` pixel-identical                             |   ⬜   |
 | M5 — Frontend & Input   | v0.5.0  | SDL2 window, joypad, frame pacing       | Tetris playable                                         |   ⬜   |
@@ -106,12 +106,11 @@ reached. Status: ✅ done · 🚧 in progress · ⬜ planned.
 <summary><b>M1 — Cartridge & Bus</b></summary>
 
 - [x] ROM path as command-line argument
-- [ ] Parse the header (title, cartridge type, ROM/RAM size)
-- [ ] Verify the header checksum (`0x014D`)
-- [ ] `Mbc` trait with a ROM-only implementation
-- [ ] `Bus` trait (`read` / `write`) with the real bus and a flat 64 KiB RAM test double
-- [ ] Address decoding (ROM, VRAM, WRAM, echo RAM, OAM, unusable area, I/O, HRAM, IE)
-- [ ] Unit tests for address decoding
+- [x] Parse the header (title, cartridge type, ROM/RAM size)
+- [x] Verify the header checksum (`0x014D`)
+- [x] `Mbc` trait with a ROM-only implementation
+- [x] `Bus` struct with full address decoding (ROM/RAM cartridge, VRAM, WRAM, echo RAM, OAM, unusable area, I/O, HRAM, IE)
+- [x] Unit tests for address decoding
 
 **Exit criterion**: header of a test ROM is parsed by an automated test.
 </details>
@@ -128,6 +127,7 @@ reached. Status: ✅ done · 🚧 in progress · ⬜ planned.
 - [ ] SingleStepTests/sm83 JSON runner
 - [ ] Headless ROM runner (Mooneye protocol, cycle timeout)
 - [ ] Optional instruction trace via `tracing`
+- [ ] `Bus` trait abstraction, with a flat 64 KiB RAM test double for SingleStepTests
 
 **Exit criterion**: all SingleStepTests/sm83 opcode files pass.
 </details>
