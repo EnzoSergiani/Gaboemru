@@ -118,8 +118,8 @@ reached. Status: ✅ done · 🚧 in progress · ⬜ planned.
 <details>
 <summary><b>M2 — CPU</b></summary>
 
-- [ ] Registers, 16-bit pairs (`AF`, `BC`, `DE`, `HL`) and flags (`Z`, `N`, `H`, `C`)
-- [ ] Post-boot state (`A=01 F=B0 BC=0013 DE=00D8 HL=014D SP=FFFE PC=0100`)
+- [x] Registers, 16-bit pairs (`AF`, `BC`, `DE`, `HL`) and flags (`Z`, `N`, `H`, `C`)
+- [x] Post-boot state (`A=01 F=B0 BC=0013 DE=00D8 HL=014D SP=FFFE PC=0100`)
 - [ ] Fetch / decode / execute loop, generic over the `Bus` trait
 - [ ] 245 valid base opcodes (256 minus 11 illegal; `0xCB` is the prefix)
 - [ ] 256 `0xCB`-prefixed opcodes
