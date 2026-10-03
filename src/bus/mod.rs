@@ -1,8 +1,12 @@
 use tracing::{debug, error, info, trace};
 
-use crate::common::types::{Address, Byte};
+use crate::{
+    cartridge::Cartridge,
+    common::types::{Address, Byte},
+};
 
 pub struct Bus {
+    cartridge: Cartridge,
     wram: [Byte; 0x2000],
     hram: [Byte; 0x7F],
 }
@@ -11,6 +15,7 @@ impl Bus {
     pub fn new(rom: Vec<Byte>) -> Self {
         info!("initialisation");
         Self {
+            cartridge: Cartridge::new(rom),
             wram: [0xFF; 0x2000],
             hram: [0xFF; 0x7F],
         }
