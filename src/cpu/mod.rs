@@ -1,3 +1,4 @@
+mod decoder;
 mod registers;
 
 use tracing::{info, trace};
