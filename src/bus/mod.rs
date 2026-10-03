@@ -108,42 +108,41 @@ impl Bus {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::common::test_helpers::build_rom;
 
-    fn minimal_rom() -> Vec<Byte> {
-        let mut rom = vec![0u8; 0x150];
-        rom[0x0147] = 0x00;
-        let checksum =
-            (0x0134..=0x014C).fold(0u8, |acc, addr| acc.wrapping_sub(rom[addr]).wrapping_sub(1));
-        rom[0x014D] = checksum;
-        rom
-    }
+    use super::*;
 
     #[test]
     fn reads_and_writes_wram() {
-        let mut bus = Bus::new(minimal_rom());
+        let mut bus = Bus::new(build_rom("", 0x00, 0x00, 0x00));
         bus.write(0xC000, 0xA0);
         assert_eq!(bus.read(0xC000), 0xA0);
     }
 
     #[test]
     fn reads_and_writes_hram() {
-        let mut bus = Bus::new(minimal_rom());
+        let mut bus = Bus::new(build_rom("", 0x00, 0x00, 0x00));
         bus.write(0xFF80, 0xA0);
         assert_eq!(bus.read(0xFF80), 0xA0);
     }
 
     #[test]
     fn prohibited_range_reads() {
-        let bus = Bus::new(minimal_rom());
+        let bus = Bus::new(build_rom("", 0x00, 0x00, 0x00));
         assert_eq!(bus.read(0xFEB0), 0xFF);
     }
 
     #[test]
     fn reads_cartridge_rom() {
-        let mut rom = minimal_rom();
+        let mut rom = build_rom("", 0x00, 0x00, 0x00);
         rom[0x0000] = 0xAB;
         let bus = Bus::new(rom);
         assert_eq!(bus.read(0x0000), 0xAB);
+    }
+
+    #[test]
+    fn reads_cartridge_ram() {
+        let bus = Bus::new(build_rom("", 0x00, 0x00, 0x00));
+        assert_eq!(bus.read(0xA000), 0xFF);
     }
 }
