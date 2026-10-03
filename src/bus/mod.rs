@@ -24,13 +24,7 @@ impl Bus {
     pub fn read(&self, address: Address) -> Byte {
         trace!("Reading from address: {:#06X}", address);
         match address {
-            0x0000..=0x7FFF | 0xA000..=0xBFFF => {
-                debug!(
-                    "Cartridge not yet implemented, read at address: {:#06x}",
-                    address
-                );
-                0xFF
-            }
+            0x0000..=0x7FFF | 0xA000..=0xBFFF => self.cartridge.read(address),
             0x8000..=0x9FFF => {
                 debug!(
                     "VRAM not yet implemented, read at address: {:#06x}",
@@ -73,10 +67,7 @@ impl Bus {
         trace!("Writing {:#04X} to address: {:#06X}", value, address);
         match address {
             0x0000..=0x7FFF | 0xA000..=0xBFFF => {
-                debug!(
-                    "Cartridge not yet implemented, write of {:#04X} at address: {:#06x}",
-                    value, address
-                );
+                self.cartridge.write(address, value);
             }
             0x8000..=0x9FFF => {
                 debug!(
@@ -146,5 +137,13 @@ mod tests {
     fn prohibited_range_reads() {
         let bus = Bus::new(minimal_rom());
         assert_eq!(bus.read(0xFEB0), 0xFF);
+    }
+
+    #[test]
+    fn reads_cartridge_rom() {
+        let mut rom = minimal_rom();
+        rom[0x0000] = 0xAB;
+        let bus = Bus::new(rom);
+        assert_eq!(bus.read(0x0000), 0xAB);
     }
 }
