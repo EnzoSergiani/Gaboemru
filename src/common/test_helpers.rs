@@ -1,6 +1,9 @@
 #![cfg(test)]
 
-use crate::common::types::Byte;
+use crate::common::{
+    bus::Bus,
+    types::{Address, Byte},
+};
 
 pub fn build_rom(title: &str, cartridge_type: Byte, rom_size: Byte, ram_size: Byte) -> Vec<Byte> {
     let mut rom = vec![0u8; 0x150];
@@ -13,4 +16,26 @@ pub fn build_rom(title: &str, cartridge_type: Byte, rom_size: Byte, ram_size: By
         (0x0134..=0x014C).fold(0u8, |acc, addr| acc.wrapping_sub(rom[addr]).wrapping_sub(1));
     rom[0x014D] = checksum;
     rom
+}
+
+pub struct FlatRam {
+    memory: [Byte; 0x10000],
+}
+
+impl FlatRam {
+    pub fn new() -> Self {
+        Self {
+            memory: [0; 0x10000],
+        }
+    }
+}
+
+impl Bus for FlatRam {
+    fn read(&self, address: Address) -> Byte {
+        self.memory[address as usize]
+    }
+
+    fn write(&mut self, address: Address, value: Byte) {
+        self.memory[address as usize] = value;
+    }
 }
