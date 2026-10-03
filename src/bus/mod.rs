@@ -1,4 +1,4 @@
-use tracing::{info, trace, warn};
+use tracing::{debug, error, info, trace};
 
 use crate::common::types::{Address, Byte};
 
@@ -19,18 +19,46 @@ impl Bus {
     pub fn read(&self, address: Address) -> Byte {
         trace!("Reading from address: {:#06X}", address);
         match address {
+            0x0000..=0x7FFF | 0xA000..=0xBFFF => {
+                debug!(
+                    "Cartridge not yet implemented, read at address: {:#06x}",
+                    address
+                );
+                0xFF
+            }
+            0x8000..=0x9FFF => {
+                debug!(
+                    "VRAM not yet implemented, read at address: {:#06x}",
+                    address
+                );
+                0xFF
+            }
             0xC000..=0xDFFF => self.wram[(address - 0xC000) as usize],
-            0xE000..=0xFDFF => {
-                warn!("Prohibited range read at address: {:#06x}", address);
+            0xE000..=0xFDFF => self.wram[(address - 0xE000) as usize],
+            0xFE00..=0xFE9F => {
+                debug!(
+                    "OAM not yet implemented, range read at address: {:#06x}",
+                    address
+                );
                 0xFF
             }
             0xFEA0..=0xFEFF => {
-                warn!("Prohibited range read at address: {:#06x}", address);
+                error!("Prohibited range read at address: {:#06x}", address);
+                0xFF
+            }
+            0xFF00..=0xFF7F => {
+                debug!(
+                    "I/O registers not yet implemented, read at address: {:#06x}",
+                    address
+                );
                 0xFF
             }
             0xFF80..=0xFFFE => self.hram[(address - 0xFF80) as usize],
-            _ => {
-                warn!("Out-of-range read at address: {:#06x}", address);
+            0xFFFF => {
+                debug!(
+                    "IE register not yet implemented, read at address: {:#06x}",
+                    address
+                );
                 0xFF
             }
         }
@@ -39,23 +67,42 @@ impl Bus {
     pub fn write(&mut self, address: Address, value: Byte) {
         trace!("Writing {:#04X} to address: {:#06X}", value, address);
         match address {
+            0x0000..=0x7FFF | 0xA000..=0xBFFF => {
+                debug!(
+                    "Cartridge not yet implemented, write of {:#04X} at address: {:#06x}",
+                    value, address
+                );
+            }
+            0x8000..=0x9FFF => {
+                debug!(
+                    "VRAM not yet implemented, write of {:#04X} at address: {:#06x}",
+                    value, address
+                );
+            }
             0xC000..=0xDFFF => self.wram[(address - 0xC000) as usize] = value,
-            0xE000..=0xFDFF => {
-                warn!(
-                    "Prohibited range write of {:#04X} at address: {:#06x}",
+            0xE000..=0xFDFF => self.wram[(address - 0xE000) as usize] = value,
+            0xFE00..=0xFE9F => {
+                debug!(
+                    "OAM not yet implemented, write of {:#04X} at address: {:#06x}",
                     value, address
                 );
             }
             0xFEA0..=0xFEFF => {
-                warn!(
+                error!(
                     "Prohibited range write of {:#04X} at address: {:#06x}",
                     value, address
                 );
             }
+            0xFF00..=0xFF7F => {
+                debug!(
+                    "I/O registers not yet implemented, write of {:#04X} at address: {:#06x}",
+                    value, address
+                );
+            }
             0xFF80..=0xFFFE => self.hram[(address - 0xFF80) as usize] = value,
-            _ => {
-                warn!(
-                    "Out-of-range write of {:#04X} at address: {:#06x}",
+            0xFFFF => {
+                debug!(
+                    "IE register not yet implemented, write of {:#04X} at address: {:#06x}",
                     value, address
                 );
             }
