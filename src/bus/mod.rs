@@ -2,8 +2,20 @@ use tracing::{debug, error, info, trace};
 
 use crate::{
     cartridge::Cartridge,
-    common::types::{Address, Byte},
+    common::{
+        bus::Bus as BusTrait,
+        types::{Address, Byte},
+    },
 };
+
+impl BusTrait for Bus {
+    fn read(&self, address: Address) -> Byte {
+        self.read(address)
+    }
+    fn write(&mut self, address: Address, value: Byte) {
+        self.write(address, value)
+    }
+}
 
 pub struct Bus {
     cartridge: Cartridge,
