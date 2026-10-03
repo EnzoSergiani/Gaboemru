@@ -61,4 +61,21 @@ impl Cartridge {
             }
         }
     }
+
+    pub fn get_header(&self) -> &CartridgeHeader {
+        &self.header
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::common::test_helpers::build_rom;
+
+    use super::*;
+
+    #[test]
+    fn getter_header() {
+        let cartridge = Cartridge::new(build_rom("TETRIS", 0x00, 0x00, 0x00));
+        assert_eq!(cartridge.get_header().title, "TETRIS");
+    }
 }

@@ -145,4 +145,10 @@ mod tests {
         let bus = Bus::new(build_rom("", 0x00, 0x00, 0x00));
         assert_eq!(bus.read(0xA000), 0xFF);
     }
+
+    #[test]
+    fn getter_cartridge_header() {
+        let bus = Bus::new(build_rom("TETRIS", 0x00, 0x00, 0x00));
+        assert_eq!(bus.cartridge.get_header().title, "TETRIS");
+    }
 }
