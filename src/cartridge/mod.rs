@@ -1,14 +1,25 @@
+mod header;
+
+pub use header::CartridgeHeader;
+
 use tracing::{error, info, trace};
 
 use crate::common::types::{Address, Byte};
 
 pub struct Cartridge {
+    header: CartridgeHeader,
 }
 
 impl Cartridge {
     pub fn new(rom: Vec<Byte>) -> Self {
+        let header: CartridgeHeader = CartridgeHeader::parse(&rom);
+
         info!("initialisation");
-        Self {}
+        info!(
+            "ROM selected: title: {} ; MBC: {:?}",
+            header.title, header.cartridge_type
+        );
+        Self { header }
     }
 
     pub fn read(&self, address: Address) -> Byte {
