@@ -1,3 +1,4 @@
+mod alu;
 mod decoder;
 mod load;
 mod registers;
