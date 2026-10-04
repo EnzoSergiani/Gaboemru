@@ -6,7 +6,7 @@ use tracing::{info, trace};
 use crate::{
     common::{
         bus::Bus,
-        types::{Byte, Word},
+        types::{Byte, Cycles, Word},
     },
     cpu::registers::Registers,
 };
@@ -21,6 +21,12 @@ impl Cpu {
         Self {
             registers: Registers::default(),
         }
+    }
+
+    pub fn step<B: Bus>(&mut self, bus: &mut B) -> Cycles {
+        let opcode = self.fetch_byte(bus);
+        trace!("Step executed with opcode: {:#04X}", opcode);
+        decoder::execute(self, bus, opcode)
     }
 
     fn fetch_byte<B: Bus>(&mut self, bus: &mut B) -> Byte {
