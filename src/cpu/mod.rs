@@ -15,6 +15,7 @@ use crate::{
 
 pub struct Cpu {
     registers: Registers,
+    ime: bool,
 }
 
 impl Cpu {
@@ -22,6 +23,7 @@ impl Cpu {
         info!("initialisation");
         Self {
             registers: Registers::default(),
+            ime: false,
         }
     }
 
@@ -75,6 +77,7 @@ mod tests {
         assert_eq!(cpu.registers.hl(), 0x014D);
         assert_eq!(cpu.registers.sp, 0xFFFE);
         assert_eq!(cpu.registers.pc, 0x0100);
+        assert_eq!(cpu.ime, false);
     }
 
     #[test]
