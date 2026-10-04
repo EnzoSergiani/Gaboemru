@@ -2,6 +2,7 @@ mod alu;
 mod control_flow;
 mod decoder;
 mod load;
+mod misc;
 mod registers;
 
 use tracing::{info, trace};
@@ -17,6 +18,9 @@ use crate::{
 pub struct Cpu {
     registers: Registers,
     ime: bool,
+    halted: bool,
+    stopped: bool,
+    ime_scheduled: bool,
 }
 
 impl Cpu {
@@ -25,6 +29,9 @@ impl Cpu {
         Self {
             registers: Registers::default(),
             ime: false,
+            halted: false,
+            stopped: false,
+            ime_scheduled: false,
         }
     }
 
@@ -79,6 +86,9 @@ mod tests {
         assert_eq!(cpu.registers.sp, 0xFFFE);
         assert_eq!(cpu.registers.pc, 0x0100);
         assert_eq!(cpu.ime, false);
+        assert_eq!(cpu.halted, false);
+        assert_eq!(cpu.stopped, false);
+        assert_eq!(cpu.ime_scheduled, false);
     }
 
     #[test]
