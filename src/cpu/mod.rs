@@ -1,4 +1,5 @@
 mod decoder;
+mod load;
 mod registers;
 
 use tracing::{info, trace};
@@ -48,6 +49,12 @@ impl Cpu {
             word, self.registers.pc
         );
         word
+    }
+}
+
+impl Default for Cpu {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

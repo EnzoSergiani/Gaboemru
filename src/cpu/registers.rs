@@ -71,9 +71,11 @@ impl Registers {
         self.h = (value >> 8) as Byte;
         self.l = value as Byte;
     }
+}
 
-    pub fn default() -> Self {
-        Registers {
+impl Default for Registers {
+    fn default() -> Self {
+        Self {
             a: 0x01,
             f: Flags::from_byte(0xB0),
             b: 0x00,
@@ -94,51 +96,51 @@ mod tests {
 
     #[test]
     fn af_packs_a_and_f() {
-        let mut regs = Registers::default();
-        regs.a = 0x12;
-        regs.f = Flags::from_byte(0x80);
-        assert_eq!(regs.af(), 0x1280);
+        let mut registers: Registers = Registers::default();
+        registers.a = 0x12;
+        registers.f = Flags::from_byte(0x80);
+        assert_eq!(registers.af(), 0x1280);
     }
 
     #[test]
     fn set_af_unpacks_a_and_f() {
-        let mut regs = Registers::default();
-        regs.set_af(0x1280);
-        assert_eq!(regs.a, 0x12);
-        assert!(regs.f.z);
-        assert!(!regs.f.n);
+        let mut registers: Registers = Registers::default();
+        registers.set_af(0x1280);
+        assert_eq!(registers.a, 0x12);
+        assert!(registers.f.z);
+        assert!(!registers.f.n);
     }
 
     #[test]
     fn bc_roundtrip() {
-        let mut regs = Registers::default();
-        regs.set_bc(0xABCD);
-        assert_eq!(regs.bc(), 0xABCD);
-        assert_eq!(regs.b, 0xAB);
-        assert_eq!(regs.c, 0xCD);
+        let mut registers: Registers = Registers::default();
+        registers.set_bc(0xABCD);
+        assert_eq!(registers.bc(), 0xABCD);
+        assert_eq!(registers.b, 0xAB);
+        assert_eq!(registers.c, 0xCD);
     }
 
     #[test]
     fn de_roundtrip() {
-        let mut regs = Registers::default();
-        regs.set_de(0xABCD);
-        assert_eq!(regs.de(), 0xABCD);
-        assert_eq!(regs.d, 0xAB);
-        assert_eq!(regs.e, 0xCD);
+        let mut registers: Registers = Registers::default();
+        registers.set_de(0xABCD);
+        assert_eq!(registers.de(), 0xABCD);
+        assert_eq!(registers.d, 0xAB);
+        assert_eq!(registers.e, 0xCD);
     }
 
     #[test]
     fn hl_roundtrip() {
-        let mut regs = Registers::default();
-        regs.set_hl(0xABCD);
-        assert_eq!(regs.hl(), 0xABCD);
-        assert_eq!(regs.h, 0xAB);
-        assert_eq!(regs.l, 0xCD);
+        let mut registers: Registers = Registers::default();
+        registers.set_hl(0xABCD);
+        assert_eq!(registers.hl(), 0xABCD);
+        assert_eq!(registers.h, 0xAB);
+        assert_eq!(registers.l, 0xCD);
     }
 
     #[test]
     fn flags_to_byte_sets_correct_bits() {
-        let flags = Flags {
+        let flags: Flags = Flags {
             z: true,
             n: false,
             h: true,
@@ -149,14 +151,14 @@ mod tests {
 
     #[test]
     fn flags_from_byte_ignores_lower_nibble() {
-        let flags = Flags::from_byte(0b1111_1111);
+        let flags: Flags = Flags::from_byte(0b1111_1111);
         assert_eq!(flags.to_byte(), 0b1111_0000);
     }
 
     #[test]
     fn flags_roundtrip() {
         for byte in [0x00, 0x80, 0x40, 0x20, 0x10, 0xF0] {
-            let flags = Flags::from_byte(byte);
+            let flags: Flags = Flags::from_byte(byte);
             assert_eq!(flags.to_byte(), byte);
         }
     }
