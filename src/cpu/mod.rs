@@ -86,10 +86,10 @@ mod tests {
         assert_eq!(cpu.registers.hl(), 0x014D);
         assert_eq!(cpu.registers.sp, 0xFFFE);
         assert_eq!(cpu.registers.pc, 0x0100);
-        assert_eq!(cpu.ime, false);
-        assert_eq!(cpu.halted, false);
-        assert_eq!(cpu.stopped, false);
-        assert_eq!(cpu.ime_scheduled, false);
+        assert!(!cpu.ime);
+        assert!(!cpu.halted);
+        assert!(!cpu.stopped);
+        assert!(!cpu.ime_scheduled);
     }
 
     #[test]
