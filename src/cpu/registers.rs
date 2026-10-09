@@ -96,7 +96,18 @@ mod tests {
 
     #[test]
     fn af_packs_a_and_f() {
-        let mut registers: Registers = Registers::default();
+        let mut registers: Registers = Registers {
+            a: 0x01,
+            f: Flags::from_byte(0xB0),
+            b: 0x00,
+            c: 0x13,
+            d: 0x00,
+            e: 0xD8,
+            h: 0x01,
+            l: 0x4D,
+            sp: 0xFFFE,
+            pc: 0x0100,
+        };
         registers.a = 0x12;
         registers.f = Flags::from_byte(0x80);
         assert_eq!(registers.af(), 0x1280);
