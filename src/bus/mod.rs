@@ -21,6 +21,8 @@ pub struct Bus {
     cartridge: Cartridge,
     wram: [Byte; 0x2000],
     hram: [Byte; 0x7F],
+    interrupt_enable: Byte,
+    interrupt_flag: Byte,
 }
 
 impl Bus {
@@ -30,6 +32,8 @@ impl Bus {
             cartridge: Cartridge::new(rom),
             wram: [0xFF; 0x2000],
             hram: [0xFF; 0x7F],
+            interrupt_enable: 0x00,
+            interrupt_flag: 0x00,
         }
     }
 
@@ -57,7 +61,15 @@ impl Bus {
                 error!("Prohibited range read at address: {:#06x}", address);
                 0xFF
             }
-            0xFF00..=0xFF7F => {
+            0xFF00..=0xFF0E => {
+                debug!(
+                    "I/O registers not yet implemented, read at address: {:#06x}",
+                    address
+                );
+                0xFF
+            }
+            0xFF0F => self.interrupt_flag | 0xE0,
+            0xFF10..=0xFF7F => {
                 debug!(
                     "I/O registers not yet implemented, read at address: {:#06x}",
                     address
@@ -65,13 +77,7 @@ impl Bus {
                 0xFF
             }
             0xFF80..=0xFFFE => self.hram[(address - 0xFF80) as usize],
-            0xFFFF => {
-                debug!(
-                    "IE register not yet implemented, read at address: {:#06x}",
-                    address
-                );
-                0xFF
-            }
+            0xFFFF => self.interrupt_enable | 0xE0,
         }
     }
 
@@ -101,20 +107,38 @@ impl Bus {
                     value, address
                 );
             }
-            0xFF00..=0xFF7F => {
+            0xFF00..=0xFF0E => {
+                debug!(
+                    "I/O registers not yet implemented, write of {:#04X} at address: {:#06x}",
+                    value, address
+                );
+            }
+            0xFF0F => self.interrupt_flag = value & 0x1F,
+            0xFF10..=0xFF7F => {
                 debug!(
                     "I/O registers not yet implemented, write of {:#04X} at address: {:#06x}",
                     value, address
                 );
             }
             0xFF80..=0xFFFE => self.hram[(address - 0xFF80) as usize] = value,
-            0xFFFF => {
-                debug!(
-                    "IE register not yet implemented, write of {:#04X} at address: {:#06x}",
-                    value, address
-                );
-            }
+            0xFFFF => self.interrupt_enable = value & 0x1F,
         }
+    }
+
+    pub fn interrupt_enable(&self) -> Byte {
+        self.interrupt_enable | 0xE0
+    }
+
+    pub fn set_interrupt_enable(&mut self, value: Byte) {
+        self.interrupt_enable = value & 0x1F;
+    }
+
+    pub fn interrupt_flag(&self) -> Byte {
+        self.interrupt_flag | 0xE0
+    }
+
+    pub fn set_interrupt_flag(&mut self, value: Byte) {
+        self.interrupt_flag = value & 0x1F;
     }
 }
 
