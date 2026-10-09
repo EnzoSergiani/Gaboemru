@@ -212,7 +212,7 @@ mod tests {
     fn parses_checksum() {
         let rom = build_rom("", 0x00, 0x00, 0x00);
         let is_valid = is_checksum_valid(&rom);
-        assert_eq!(is_valid, true);
+        assert!(is_valid);
     }
 
     #[test]
