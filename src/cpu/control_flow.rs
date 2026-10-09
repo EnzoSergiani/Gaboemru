@@ -2,7 +2,7 @@ use crate::common::types::{Address, Byte, Cycles, Word};
 
 use super::{Bus, Cpu};
 
-fn push_word<B: Bus>(cpu: &mut Cpu, bus: &mut B, value: Word) {
+pub fn push_word<B: Bus>(cpu: &mut Cpu, bus: &mut B, value: Word) {
     cpu.registers.sp = cpu.registers.sp.wrapping_sub(1);
     bus.write(cpu.registers.sp, (value >> 8) as Byte);
     cpu.registers.sp = cpu.registers.sp.wrapping_sub(1);

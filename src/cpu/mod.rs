@@ -11,13 +11,13 @@ use tracing::{info, trace};
 use crate::{
     common::{
         bus::Bus,
-        types::{Byte, Cycles, Word},
+        types::{Address, Byte, Cycles, Word},
     },
     cpu::registers::Registers,
 };
 
 pub struct Cpu {
-    registers: Registers,
+    pub registers: Registers,
     ime: bool,
     halted: bool,
     stopped: bool,
@@ -73,6 +73,27 @@ impl Cpu {
 
     pub fn state(&self) -> (&Registers, bool) {
         (&self.registers, self.ime)
+    }
+
+    pub fn ime(&mut self) -> bool {
+        self.ime
+    }
+
+    pub fn set_ime(&mut self, enable: bool) {
+        self.ime = enable;
+    }
+
+    pub fn is_halted(&self) -> bool {
+        self.halted
+    }
+
+    pub fn clear_halted(&mut self) {
+        self.halted = false;
+    }
+
+    pub fn dispatch_interrupt<B: Bus>(&mut self, bus: &mut B, vector: Address) {
+        control_flow::push_word(self, bus, self.registers.pc);
+        self.registers.pc = vector;
     }
 }
 

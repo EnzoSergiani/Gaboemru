@@ -21,7 +21,9 @@ fn main() -> std::io::Result<()> {
     let rom_path = std::env::args().nth(1).expect("usage: gaboemru <rom.gb>");
     let rom = fs::read(rom_path).expect("failed to read ROM");
 
-    let gb = GameBoy::new(rom);
+    let mut gb = GameBoy::new(rom);
+
+    gb.run();
 
     info!("Program ended");
 
