@@ -64,13 +64,22 @@ impl Bus {
                 error!("Prohibited range read at address: {:#06x}", address);
                 0xFF
             }
-            0xFF00..=0xFF0E => {
+            0xFF00..=0xFF03 => {
                 debug!(
                     "I/O registers not yet implemented, read at address: {:#06x}",
                     address
                 );
                 0xFF
             }
+            0xFF04 => self.timer.div(),
+            0xFF05..=0xFF0E => {
+                debug!(
+                    "I/O registers not yet implemented, read at address: {:#06x}",
+                    address
+                );
+                0xFF
+            }
+
             0xFF0F => self.interrupt_flag | 0xE0,
             0xFF10..=0xFF7F => {
                 debug!(
@@ -110,12 +119,20 @@ impl Bus {
                     value, address
                 );
             }
-            0xFF00..=0xFF0E => {
+            0xFF00..=0xFF03 => {
                 debug!(
                     "I/O registers not yet implemented, write of {:#04X} at address: {:#06x}",
                     value, address
                 );
             }
+            0xFF04 => self.timer.reset_div(),
+            0xFF05..=0xFF0E => {
+                debug!(
+                    "I/O registers not yet implemented, write of {:#04X} at address: {:#06x}",
+                    value, address
+                );
+            }
+
             0xFF0F => self.interrupt_flag = value & 0x1F,
             0xFF10..=0xFF7F => {
                 debug!(
