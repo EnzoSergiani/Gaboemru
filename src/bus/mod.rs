@@ -6,6 +6,7 @@ use crate::{
         bus::Bus as BusTrait,
         types::{Address, Byte},
     },
+    timer::Timer,
 };
 
 impl BusTrait for Bus {
@@ -23,6 +24,7 @@ pub struct Bus {
     hram: [Byte; 0x7F],
     interrupt_enable: Byte,
     interrupt_flag: Byte,
+    timer: Timer,
 }
 
 impl Bus {
@@ -34,6 +36,7 @@ impl Bus {
             hram: [0xFF; 0x7F],
             interrupt_enable: 0x00,
             interrupt_flag: 0x00,
+            timer: Timer::new(),
         }
     }
 
