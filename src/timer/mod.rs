@@ -3,11 +3,16 @@ use crate::common::types::{Byte, Word};
 pub struct Timer {
     ticks: Word,
     tima: Byte,
+    tma: Byte,
 }
 
 impl Timer {
     pub fn new() -> Self {
-        Self { ticks: 0, tima: 0 }
+        Self {
+            ticks: 0,
+            tima: 0,
+            tma: 0,
+        }
     }
 
     pub fn div(&self) -> Byte {
@@ -24,6 +29,14 @@ impl Timer {
 
     pub fn set_tima(&mut self, value: Byte) {
         self.tima = value;
+    }
+
+    pub fn tma(&self) -> Byte {
+        self.tma
+    }
+
+    pub fn set_tma(&mut self, value: Byte) {
+        self.tma = value;
     }
 }
 

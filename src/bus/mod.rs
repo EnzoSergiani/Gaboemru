@@ -73,7 +73,8 @@ impl Bus {
             }
             0xFF04 => self.timer.div(),
             0xFF05 => self.timer.tima(),
-            0xFF06..=0xFF0E => {
+            0xFF06 => self.timer.tma(),
+            0xFF07..=0xFF0E => {
                 debug!(
                     "I/O registers not yet implemented, read at address: {:#06x}",
                     address
@@ -128,7 +129,8 @@ impl Bus {
             }
             0xFF04 => self.timer.reset_div(),
             0xFF05 => self.timer.set_tima(value),
-            0xFF06..=0xFF0E => {
+            0xFF06 => self.timer.set_tma(value),
+            0xFF07..=0xFF0E => {
                 debug!(
                     "I/O registers not yet implemented, write of {:#04X} at address: {:#06x}",
                     value, address
