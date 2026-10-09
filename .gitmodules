@@ -1,0 +1,3 @@
+[submodule "tests/data/sm83"]
+	path = tests/data/sm83
+	url = https://github.com/SingleStepTests/sm83
