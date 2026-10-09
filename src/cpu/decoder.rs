@@ -1,4 +1,4 @@
-use tracing::error;
+use tracing::{error, trace};
 
 use crate::{
     common::{
@@ -9,6 +9,7 @@ use crate::{
 };
 
 pub fn execute<B: Bus>(cpu: &mut Cpu, bus: &mut B, opcode: Byte) -> Cycles {
+    trace!("Execute opcode: {:#04X}", opcode);
     match opcode {
         0x00 => misc::nop(cpu),
         0x01 => load::ld_bc_n16(cpu, bus),
@@ -258,10 +259,69 @@ pub fn execute<B: Bus>(cpu: &mut Cpu, bus: &mut B, opcode: Byte) -> Cycles {
         0xFB => misc::ei(cpu),
         0xFE => alu::cp_a_n8(cpu, bus),
         0xFF => control_flow::rst_38(cpu, bus),
-        _ => {
-            error!("Opcode {:#04X} not yet implemented", opcode);
-            0
+        0xD3 | 0xDB | 0xDD | 0xE3 | 0xE4 | 0xEB | 0xEC | 0xED | 0xF4 | 0xFC | 0xFD => {
+            error!(
+                "Illegal opcode: {:#04X} — CPU likely desynchronized",
+                opcode
+            );
+            4
         }
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use crate::common::test_helpers::FlatRam;
+
+    use super::*;
+
+    #[test]
+    fn execute_dispatches_nop() {
+        let mut cpu = Cpu::new();
+        let mut bus = FlatRam::new();
+        let cycles = execute(&mut cpu, &mut bus, 0x00);
+        assert_eq!(cycles, 4);
+    }
+
+    #[test]
+    fn execute_dispatches_cb_prefix() {
+        let mut cpu = Cpu::new();
+        let mut bus = FlatRam::new();
+        bus.write(cpu.registers.pc, 0x40);
+
+        let cycles = execute(&mut cpu, &mut bus, 0xCB);
+        assert_eq!(cycles, 8);
+    }
+
+    #[test]
+    fn all_256_cb_opcodes_are_covered() {
+        let mut cpu = Cpu::new();
+        let mut bus = FlatRam::new();
+        for opcode in 0x00..=0xFF {
+            execute(&mut cpu, &mut bus, opcode);
+        }
+    }
+
+    #[test]
+    fn all_opcodes_execute_without_panic() {
+        for opcode in 0x00..=0xFF {
+            let mut cpu = Cpu::new();
+            let mut bus = FlatRam::new();
+            bus.write(cpu.registers.pc, 0x00);
+            bus.write(cpu.registers.pc + 1, 0x00);
+            execute(&mut cpu, &mut bus, opcode);
+        }
+    }
+
+    #[test]
+    fn illegal_opcodes_cost_4_cycles_and_do_not_crash() {
+        for opcode in [
+            0xD3, 0xDB, 0xDD, 0xE3, 0xE4, 0xEB, 0xEC, 0xED, 0xF4, 0xFC, 0xFD,
+        ] {
+            let mut cpu = Cpu::new();
+            let mut bus = FlatRam::new();
+            let cycles = execute(&mut cpu, &mut bus, opcode);
+            assert_eq!(cycles, 4);
+        }
+    }
+}
