@@ -4,6 +4,7 @@ pub struct Timer {
     ticks: Word,
     tima: Byte,
     tma: Byte,
+    tac: Byte,
 }
 
 impl Timer {
@@ -12,6 +13,7 @@ impl Timer {
             ticks: 0,
             tima: 0,
             tma: 0,
+            tac: 0,
         }
     }
 
@@ -37,6 +39,14 @@ impl Timer {
 
     pub fn set_tma(&mut self, value: Byte) {
         self.tma = value;
+    }
+
+    pub fn tac(&self) -> Byte {
+        self.tac | 0xF8
+    }
+
+    pub fn set_tac(&mut self, value: Byte) {
+        self.tac = value & 0x07;
     }
 }
 
