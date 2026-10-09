@@ -26,7 +26,7 @@ pub fn execute<B: Bus>(cpu: &mut Cpu, bus: &mut B, opcode: Byte) -> Cycles {
         0x0D => alu::dec_c(cpu),
         0x0E => load::ld_c_n8(cpu, bus),
         0x0F => misc::rrca(cpu),
-        0x10 => misc::stop(cpu, bus),
+        0x10 => misc::stop(cpu),
         0x11 => load::ld_de_n16(cpu, bus),
         0x12 => load::ld_de_a(cpu, bus),
         0x13 => alu::inc_de(cpu),

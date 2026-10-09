@@ -1,16 +1,14 @@
-// src/cpu/misc.rs
 use crate::common::types::{Byte, Cycles};
 
-use super::{Bus, Cpu};
+use super::Cpu;
 
 pub fn nop(_cpu: &mut Cpu) -> Cycles {
     4
 }
 
-pub fn stop<B: Bus>(cpu: &mut Cpu, bus: &mut B) -> Cycles {
-    let _ = cpu.fetch_byte(bus);
+pub fn stop(cpu: &mut Cpu) -> Cycles {
     cpu.stopped = true;
-    4
+    12
 }
 
 pub fn halt(cpu: &mut Cpu) -> Cycles {
@@ -77,7 +75,6 @@ pub fn rra(cpu: &mut Cpu) -> Cycles {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::common::test_helpers::FlatRam;
     use crate::cpu::Cpu;
 
     #[test]
@@ -98,16 +95,13 @@ mod tests {
     }
 
     #[test]
-    fn stop_consumes_padding_byte_and_advances_pc() {
+    fn stop_sets_stopped_flag_and_costs_12_cycles() {
         let mut cpu = Cpu::new();
-        let mut bus = FlatRam::new();
         let pc_before = cpu.registers.pc;
-        bus.write(cpu.registers.pc, 0x00);
-
-        stop(&mut cpu, &mut bus);
-
+        let cycles = stop(&mut cpu);
         assert!(cpu.stopped);
-        assert_eq!(cpu.registers.pc, pc_before.wrapping_add(1));
+        assert_eq!(cpu.registers.pc, pc_before);
+        assert_eq!(cycles, 12);
     }
 
     #[test]
