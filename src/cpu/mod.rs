@@ -1,4 +1,5 @@
 mod alu;
+mod cb;
 mod control_flow;
 mod decoder;
 mod load;

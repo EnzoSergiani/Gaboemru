@@ -5,7 +5,7 @@ use crate::{
         bus::Bus,
         types::{Byte, Cycles},
     },
-    cpu::{Cpu, alu, control_flow, load, misc},
+    cpu::{Cpu, alu, cb, control_flow, load, misc},
 };
 
 pub fn execute<B: Bus>(cpu: &mut Cpu, bus: &mut B, opcode: Byte) -> Cycles {
@@ -213,6 +213,10 @@ pub fn execute<B: Bus>(cpu: &mut Cpu, bus: &mut B, opcode: Byte) -> Cycles {
         0xC8 => control_flow::ret_z(cpu, bus),
         0xC9 => control_flow::ret(cpu, bus),
         0xCA => control_flow::jp_z_nn(cpu, bus),
+        0xCB => {
+            let cb_opcode: Byte = cpu.fetch_byte(bus);
+            cb::execute(cpu, bus, cb_opcode)
+        }
         0xCC => control_flow::call_z_nn(cpu, bus),
         0xCD => control_flow::call_nn(cpu, bus),
         0xCE => alu::adc_a_n8(cpu, bus),
