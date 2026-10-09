@@ -33,7 +33,7 @@ cargo test
 cargo run --release -- path/to/rom.gb
 ```
 
-> ROM loading arrives with M1, and the window with M5.
+> The ROM header is parsed from M1; the display window arrives with M5.
 
 ### Using Nix (optional)
 
@@ -81,8 +81,8 @@ reached. Status: ✅ done · 🚧 in progress · ⬜ planned.
 | ----------------------- | ------- | --------------------------------------- | ------------------------------------------------------- | :----: |
 | M0 — Foundations        | v0.0.0  | Tooling, CI, logging, lib/bin split     | CI green on `main`                                      |   ✅   |
 | M1 — Cartridge & Bus    | v0.1.0  | ROM loading, header, memory map         | Header of a test ROM parsed                             |   ✅   |
-| M2 — CPU                | v0.2.0  | Full instruction set, cycle counts      | All SingleStepTests/sm83 opcode files pass              |   🚧   |
-| M3 — Interrupts & Timer | v0.3.0  | IME/IE/IF, timer, HALT, serial          | Interrupt, timer and HALT Mooneye ROMs in the allowlist |   ⬜   |
+| M2 — CPU                | v0.2.0  | Full instruction set, cycle counts      | All SingleStepTests/sm83 opcode files pass              |   ✅   |
+| M3 — Interrupts & Timer | v0.3.0  | IME/IE/IF, timer, HALT, serial          | Interrupt, timer and HALT Mooneye ROMs in the allowlist |   🚧   |
 | M4 — PPU                | v0.4.0  | LCD modes, BG, window, sprites, OAM DMA | `dmg-acid2` pixel-identical                             |   ⬜   |
 | M5 — Frontend & Input   | v0.5.0  | SDL2 window, joypad, frame pacing       | Tetris playable                                         |   ⬜   |
 | M6 — Cartridge mappers  | v0.6.0  | MBC1, MBC3 (RTC), MBC5, saves           | Mooneye MBC tests pass, saves survive a restart         |   ⬜   |
@@ -120,14 +120,13 @@ reached. Status: ✅ done · 🚧 in progress · ⬜ planned.
 
 - [x] Registers, 16-bit pairs (`AF`, `BC`, `DE`, `HL`) and flags (`Z`, `N`, `H`, `C`)
 - [x] Post-boot state (`A=01 F=B0 BC=0013 DE=00D8 HL=014D SP=FFFE PC=0100`)
-- [ ] Fetch / decode / execute loop, generic over the `Bus` trait
-- [ ] 245 valid base opcodes (256 minus 11 illegal; `0xCB` is the prefix)
-- [ ] 256 `0xCB`-prefixed opcodes
-- [ ] Cycle counting (including conditional branches)
-- [ ] SingleStepTests/sm83 JSON runner
-- [ ] Headless ROM runner (Mooneye protocol, cycle timeout)
-- [ ] Optional instruction trace via `tracing`
-- [ ] `Bus` trait abstraction, with a flat 64 KiB RAM test double for SingleStepTests
+- [x] Fetch / decode / execute loop, generic over the `Bus` trait
+- [x] 245 valid base opcodes (256 minus 11 illegal; `0xCB` is the prefix)
+- [x] 256 `0xCB`-prefixed opcodes
+- [x] Cycle counting (including conditional branches)
+- [x] SingleStepTests/sm83 JSON runner
+- [x] Optional instruction trace via `tracing`
+- [x] `Bus` trait abstraction, with a flat 64 KiB RAM test double for SingleStepTests
 
 **Exit criterion**: all SingleStepTests/sm83 opcode files pass.
 </details>
@@ -140,6 +139,8 @@ reached. Status: ✅ done · 🚧 in progress · ⬜ planned.
 - [ ] `EI` delay, `HALT` and the HALT bug
 - [ ] Timer: `DIV`, `TIMA`, `TMA`, `TAC` and overflow interrupt
 - [ ] Serial port (`SB` / `SC`) and its interrupt
+- [ ] `Cpu` wired into `GameBoy` (owns and steps it each loop iteration)
+- [ ] Headless Mooneye ROM runner (`LD B,B` success protocol, cycle timeout, `tests/mooneye_allowlist.txt`)
 
 **Exit criterion**: interrupt, timer and HALT Mooneye ROMs added to the allowlist pass.
 </details>
@@ -219,6 +220,7 @@ Built-in debugger · Save states · Boot ROM support (unlocks boot-dependent Moo
 src/
 ├── bus/
 ├── cartridge/
+├── cpu/
 ├── common/
 ├── emulator/
 ├── lib.rs

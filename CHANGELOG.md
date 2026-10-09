@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-09
+
+### Added
+
+- Full CPU instruction set: all 245 valid base opcodes and all 256 `0xCB`-prefixed opcodes
+- Fetch/decode/execute loop generic over the `Bus` trait
+- SingleStepTests/sm83 integration test runner (500,000 cases, all passing)
+- `tracing`-based instruction-level logging (`trace!`/`debug!`/`error!`)
+
+### Fixed
+
+- `STOP` (`0x10`) no longer consumes a non-existent second byte; the opcode is
+  effectively 1 byte on real hardware, with a fixed 12-cycle cost, confirmed
+  against SingleStepTests/sm83 and cross-referenced with the official
+  encoding note (`Cycles: -` in the RGBDS opcode reference)
+- `INC HL`/`DEC HL` (register) and `INC (HL)`/`DEC (HL)` (memory) dispatch
+  targets were swapped in the opcode table
+- `0xCB`/`0xCD` dispatch targets were swapped (prefix vs. `CALL nn`)
+- `0x7C` (`LD A,H`) was incorrectly dispatched as `LD A,B`
+
 ## [0.1.0] - 2026-10-03
 
 ### Added
