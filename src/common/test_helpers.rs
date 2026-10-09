@@ -1,5 +1,3 @@
-#![cfg(test)]
-
 use crate::common::{
     bus::Bus,
     types::{Address, Byte},
@@ -27,6 +25,12 @@ impl FlatRam {
         Self {
             memory: [0; 0x10000],
         }
+    }
+}
+
+impl Default for FlatRam {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

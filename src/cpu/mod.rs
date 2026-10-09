@@ -4,7 +4,7 @@ mod control_flow;
 mod decoder;
 mod load;
 mod misc;
-mod registers;
+pub mod registers;
 
 use tracing::{info, trace};
 
@@ -61,6 +61,18 @@ impl Cpu {
             word, self.registers.pc
         );
         word
+    }
+
+    pub fn set_state(&mut self, registers: Registers, ime: bool) {
+        self.registers = registers;
+        self.ime = ime;
+        self.ime_scheduled = false;
+        self.halted = false;
+        self.stopped = false;
+    }
+
+    pub fn state(&self) -> (&Registers, bool) {
+        (&self.registers, self.ime)
     }
 }
 
