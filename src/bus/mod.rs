@@ -194,6 +194,10 @@ impl Bus {
         if self.timer.is_interrupt_requested() {
             self.interrupt_flag |= 0x04;
         }
+        self.serial.tick(cycles);
+        if self.serial.is_interrupt_requested() {
+            self.interrupt_flag |= 0x08;
+        }
     }
 }
 
@@ -293,5 +297,33 @@ mod tests {
         assert_eq!(bus.read(0xFF01), 0x42);
         bus.write(0xFF02, 0x00);
         assert_eq!(bus.read(0xFF02), 0x7E);
+    }
+
+    #[test]
+    fn tick_completes_serial_transfer_and_requests_interrupt() {
+        let mut bus = Bus::new(build_rom("", 0x00, 0x00, 0x00));
+        bus.write(0xFF02, 0x81);
+        bus.tick(4096);
+        assert_eq!(bus.read(0xFF02) & 0x80, 0x00);
+        assert_eq!(bus.read(0xFF01), 0xFF);
+        assert_eq!(bus.interrupt_flag() & 0x08, 0x08);
+    }
+
+    #[test]
+    fn tick_does_not_complete_serial_transfer_before_4096_cycles() {
+        let mut bus = Bus::new(build_rom("", 0x00, 0x00, 0x00));
+        bus.write(0xFF02, 0x81);
+        bus.tick(4095);
+        assert_eq!(bus.read(0xFF02) & 0x80, 0x80);
+        assert_eq!(bus.interrupt_flag() & 0x08, 0x00);
+    }
+
+    #[test]
+    fn external_clock_serial_transfer_stays_pending() {
+        let mut bus = Bus::new(build_rom("", 0x00, 0x00, 0x00));
+        bus.write(0xFF02, 0x80);
+        bus.tick(100_000);
+        assert_eq!(bus.read(0xFF02) & 0x80, 0x80);
+        assert_eq!(bus.interrupt_flag() & 0x08, 0x00);
     }
 }
