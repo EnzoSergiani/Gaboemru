@@ -75,7 +75,8 @@ impl Bus {
                 0xFF
             }
             0xFF01 => self.serial.sb(),
-            0xFF02..=0xFF03 => {
+            0xFF02 => self.serial.sc(),
+            0xFF03 => {
                 debug!(
                     "I/O registers not yet implemented, read at address: {:#06x}",
                     address
@@ -141,7 +142,8 @@ impl Bus {
                 );
             }
             0xFF01 => self.serial.set_sb(value),
-            0xFF02..=0xFF03 => {
+            0xFF02 => self.serial.set_sc(value),
+            0xFF03 => {
                 debug!(
                     "I/O registers not yet implemented, write of {:#04X} at address: {:#06x}",
                     value, address
@@ -282,5 +284,14 @@ mod tests {
         let mut bus = Bus::new(build_rom("", 0x00, 0x00, 0x00));
         bus.write(0xFF0F, 0xFF);
         assert_eq!(bus.read(0xFF0F), 0xFF);
+    }
+
+    #[test]
+    fn reads_and_writes_serial_registers() {
+        let mut bus = Bus::new(build_rom("", 0x00, 0x00, 0x00));
+        bus.write(0xFF01, 0x42);
+        assert_eq!(bus.read(0xFF01), 0x42);
+        bus.write(0xFF02, 0x00);
+        assert_eq!(bus.read(0xFF02), 0x7E);
     }
 }
