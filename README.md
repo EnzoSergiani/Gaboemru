@@ -77,17 +77,17 @@ Development is organised in milestones. Each one ends with a **measurable exit
 criterion** (an automated test) and is tagged with a version (`v0.x.0`) when
 reached. Status: ✅ done · 🚧 in progress · ⬜ planned.
 
-| Milestone               | Version | Scope                                   | Exit criterion                                          | Status |
-| ----------------------- | ------- | --------------------------------------- | ------------------------------------------------------- | :----: |
-| M0 — Foundations        | v0.0.0  | Tooling, CI, logging, lib/bin split     | CI green on `main`                                      |   ✅   |
-| M1 — Cartridge & Bus    | v0.1.0  | ROM loading, header, memory map         | Header of a test ROM parsed                             |   ✅   |
-| M2 — CPU                | v0.2.0  | Full instruction set, cycle counts      | All SingleStepTests/sm83 opcode files pass              |   ✅   |
-| M3 — Interrupts & Timer | v0.3.0  | IME/IE/IF, timer, HALT, serial          | Interrupt, timer and HALT Mooneye ROMs in the allowlist |   🚧   |
-| M4 — PPU                | v0.4.0  | LCD modes, BG, window, sprites, OAM DMA | `dmg-acid2` pixel-identical                             |   ⬜   |
-| M5 — Frontend & Input   | v0.5.0  | SDL2 window, joypad, frame pacing       | Tetris playable                                         |   ⬜   |
-| M6 — Cartridge mappers  | v0.6.0  | MBC1, MBC3 (RTC), MBC5, saves           | Mooneye MBC tests pass, saves survive a restart         |   ⬜   |
-| M7 — APU                | v0.7.0  | 4 sound channels, resampling            | `dmg_sound`                                             |   ⬜   |
-| M8 — Accuracy           | v0.8.0  | M-cycle accurate bus                    | Per-cycle SingleStepTests + full Mooneye DMG acceptance |   ⬜   |
+| Milestone               | Version | Scope                                   | Exit criterion                                                 | Status |
+| ----------------------- | ------- | --------------------------------------- | -------------------------------------------------------------- | :----: |
+| M0 — Foundations        | v0.0.0  | Tooling, CI, logging, lib/bin split     | CI green on `main`                                             |   ✅   |
+| M1 — Cartridge & Bus    | v0.1.0  | ROM loading, header, memory map         | Header of a test ROM parsed                                    |   ✅   |
+| M2 — CPU                | v0.2.0  | Full instruction set, cycle counts      | All SingleStepTests/sm83 opcode files pass                     |   ✅   |
+| M3 — Interrupts & Timer | v0.3.0  | IME/IE/IF, timer, HALT, serial          | Unit/integration tests pass; Mooneye validation deferred to M4 |   ✅   |
+| M4 — PPU                | v0.4.0  | LCD modes, BG, window, sprites, OAM DMA | `dmg-acid2` pixel-identical                                    |   🚧   |
+| M5 — Frontend & Input   | v0.5.0  | SDL2 window, joypad, frame pacing       | Tetris playable                                                |   ⬜   |
+| M6 — Cartridge mappers  | v0.6.0  | MBC1, MBC3 (RTC), MBC5, saves           | Mooneye MBC tests pass, saves survive a restart                |   ⬜   |
+| M7 — APU                | v0.7.0  | 4 sound channels, resampling            | `dmg_sound`                                                    |   ⬜   |
+| M8 — Accuracy           | v0.8.0  | M-cycle accurate bus                    | Per-cycle SingleStepTests + full Mooneye DMG acceptance        |   ⬜   |
 
 <details>
 <summary><b>M0 — Foundations</b></summary>
@@ -134,15 +134,15 @@ reached. Status: ✅ done · 🚧 in progress · ⬜ planned.
 <details>
 <summary><b>M3 — Interrupts & Timer</b></summary>
 
-- [ ] `IME`, `IE` (`0xFFFF`), `IF` (`0xFF0F`)
-- [ ] Interrupt dispatch and vectors (`0x40`, `0x48`, `0x50`, `0x58`, `0x60`)
-- [ ] `EI` delay, `HALT` and the HALT bug
-- [ ] Timer: `DIV`, `TIMA`, `TMA`, `TAC` and overflow interrupt
-- [ ] Serial port (`SB` / `SC`) and its interrupt
-- [ ] `Cpu` wired into `GameBoy` (owns and steps it each loop iteration)
-- [ ] Headless Mooneye ROM runner (`LD B,B` success protocol, cycle timeout, `tests/mooneye_allowlist.txt`)
+- [x] `IME`, `IE` (`0xFFFF`), `IF` (`0xFF0F`)
+- [x] Interrupt dispatch and vectors (`0x40`, `0x48`, `0x50`, `0x58`, `0x60`)
+- [x] `EI` delay, `HALT` and the HALT bug
+- [x] Timer: `DIV`, `TIMA`, `TMA`, `TAC` and overflow interrupt
+- [x] Serial port (`SB` / `SC`) and its interrupt
+- [x] `Cpu` wired into `GameBoy` (owns and steps it each loop iteration)
+- [x] Headless Mooneye ROM runner (`LD B,B` success protocol, cycle timeout, `tests/mooneye_allowlist.txt`)
 
-**Exit criterion**: interrupt, timer and HALT Mooneye ROMs added to the allowlist pass.
+**Exit criterion**: unit and integration tests cover IME/IE/IF dispatch, HALT (including the HALT bug), the timer and serial peripherals; the headless Mooneye runner exists and will be validated against real ROMs starting M4, once a PPU is implemented.
 </details>
 
 <details>
@@ -224,6 +224,7 @@ src/
 ├── common/
 ├── emulator/
 ├── serial/
+├── timer/
 ├── lib.rs
 └── main.rs
 ```

@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-10
+
+### Added
+
+- `IE`/`IF` registers with real storage, full interrupt dispatch
+  (`GameBoy::handle_interrupts`), priority ordering, and `HALT` wake-up
+  independent of `IME`
+- `Timer` peripheral (`DIV`/`TIMA`/`TMA`/`TAC`), modeled as a single 16-bit
+  counter with falling-edge detection on the selected bit, matching real
+  hardware behavior rather than an independent countdown
+- `Serial` peripheral (`SB`/`SC`), internal-clock transfers complete and
+  request an interrupt; external-clock transfers remain pending indefinitely
+  (no link cable emulation)
+- The HALT bug: `HALT` executed with `IME=false` and a pending interrupt no
+  longer actually halts the CPU; the following byte is read twice, matching
+  documented hardware behavior
+- `Cpu` wired into `GameBoy`, with a working `run()` loop
+- Headless Mooneye ROM runner (`LD B,B` success protocol, cycle timeout)
+
+### Changed
+
+- M3's exit criterion no longer requires passing Mooneye ROMs directly:
+  validation against real ROMs is deferred to M4, since Mooneye's shared
+  test harness depends on PPU/VBlank synchronization that doesn't exist yet
+
 ## [0.2.0] - 2026-10-09
 
 ### Added
