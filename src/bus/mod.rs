@@ -67,13 +67,22 @@ impl Bus {
                 error!("Prohibited range read at address: {:#06x}", address);
                 0xFF
             }
-            0xFF00..=0xFF03 => {
+            0xFF00 => {
                 debug!(
                     "I/O registers not yet implemented, read at address: {:#06x}",
                     address
                 );
                 0xFF
             }
+            0xFF01 => self.serial.sb(),
+            0xFF02..=0xFF03 => {
+                debug!(
+                    "I/O registers not yet implemented, read at address: {:#06x}",
+                    address
+                );
+                0xFF
+            }
+
             0xFF04 => self.timer.div(),
             0xFF05 => self.timer.tima(),
             0xFF06 => self.timer.tma(),
@@ -125,12 +134,20 @@ impl Bus {
                     value, address
                 );
             }
-            0xFF00..=0xFF03 => {
+            0xFF00 => {
                 debug!(
                     "I/O registers not yet implemented, write of {:#04X} at address: {:#06x}",
                     value, address
                 );
             }
+            0xFF01 => self.serial.set_sb(value),
+            0xFF02..=0xFF03 => {
+                debug!(
+                    "I/O registers not yet implemented, write of {:#04X} at address: {:#06x}",
+                    value, address
+                );
+            }
+
             0xFF04 => self.timer.reset_div(),
             0xFF05 => self.timer.set_tima(value),
             0xFF06 => self.timer.set_tma(value),
