@@ -4,7 +4,7 @@ use crate::{
     cartridge::Cartridge,
     common::{
         bus::Bus as BusTrait,
-        types::{Address, Byte},
+        types::{Address, Byte, Cycles},
     },
     timer::Timer,
 };
@@ -166,6 +166,13 @@ impl Bus {
     pub fn set_interrupt_flag(&mut self, value: Byte) {
         self.interrupt_flag = value & 0x1F;
     }
+
+    pub fn tick(&mut self, cycles: Cycles) {
+        self.timer.tick(cycles);
+        if self.timer.is_interrupt_requested() {
+            self.interrupt_flag |= 0x04;
+        }
+    }
 }
 
 #[cfg(test)]
@@ -212,5 +219,48 @@ mod tests {
     fn getter_cartridge_header() {
         let bus = Bus::new(build_rom("TETRIS", 0x00, 0x00, 0x00));
         assert_eq!(bus.cartridge.get_header().title, "TETRIS");
+    }
+
+    #[test]
+    fn reads_and_writes_timer_registers() {
+        let mut bus = Bus::new(build_rom("", 0x00, 0x00, 0x00));
+        bus.write(0xFF06, 0x42);
+        assert_eq!(bus.read(0xFF06), 0x42);
+        bus.write(0xFF07, 0b101);
+        assert_eq!(bus.read(0xFF07), 0b1111_1101);
+        bus.write(0xFF05, 0x10); // TIMA
+        assert_eq!(bus.read(0xFF05), 0x10);
+    }
+
+    #[test]
+    fn writing_div_resets_it_regardless_of_value() {
+        let mut bus = Bus::new(build_rom("", 0x00, 0x00, 0x00));
+        bus.tick(1000);
+        assert_ne!(bus.read(0xFF04), 0x00);
+        bus.write(0xFF04, 0xAB);
+        assert_eq!(bus.read(0xFF04), 0x00);
+    }
+
+    #[test]
+    fn tick_requests_timer_interrupt_on_tima_overflow() {
+        let mut bus = Bus::new(build_rom("", 0x00, 0x00, 0x00));
+        bus.write(0xFF07, 0b101);
+        bus.write(0xFF05, 0xFF);
+        bus.tick(16);
+        assert_eq!(bus.interrupt_flag() & 0x04, 0x04);
+    }
+
+    #[test]
+    fn interrupt_enable_masks_unused_bits() {
+        let mut bus = Bus::new(build_rom("", 0x00, 0x00, 0x00));
+        bus.write(0xFFFF, 0xFF);
+        assert_eq!(bus.read(0xFFFF), 0xFF);
+    }
+
+    #[test]
+    fn interrupt_flag_masks_unused_bits() {
+        let mut bus = Bus::new(build_rom("", 0x00, 0x00, 0x00));
+        bus.write(0xFF0F, 0xFF);
+        assert_eq!(bus.read(0xFF0F), 0xFF);
     }
 }

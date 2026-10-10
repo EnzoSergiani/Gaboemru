@@ -21,7 +21,9 @@ impl GameBoy {
 
     fn step(&mut self) -> Cycles {
         trace!("Step executed");
-        self.cpu.step(&mut self.bus)
+        let cycles = self.cpu.step(&mut self.bus);
+        self.bus.tick(cycles);
+        cycles
     }
 
     pub fn run(&mut self) {
