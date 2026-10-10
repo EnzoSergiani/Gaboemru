@@ -1,0 +1,3 @@
+struct Serial {}
+
+impl Serial {}

@@ -223,6 +223,7 @@ src/
 ├── cpu/
 ├── common/
 ├── emulator/
+├── serial/
 ├── lib.rs
 └── main.rs
 ```
