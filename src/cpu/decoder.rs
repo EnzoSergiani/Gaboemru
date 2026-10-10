@@ -129,7 +129,7 @@ pub fn execute<B: Bus>(cpu: &mut Cpu, bus: &mut B, opcode: Byte) -> Cycles {
         0x73 => load::ld_hl_e(cpu, bus),
         0x74 => load::ld_hl_h(cpu, bus),
         0x75 => load::ld_hl_l(cpu, bus),
-        0x76 => misc::halt(cpu),
+        0x76 => misc::halt(cpu, bus),
         0x77 => load::ld_hl_a(cpu, bus),
         0x78 => load::ld_a_b(cpu),
         0x79 => load::ld_a_c(cpu),

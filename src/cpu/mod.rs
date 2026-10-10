@@ -22,6 +22,7 @@ pub struct Cpu {
     halted: bool,
     stopped: bool,
     ime_scheduled: bool,
+    halt_bug_pending: bool,
 }
 
 impl Cpu {
@@ -33,6 +34,7 @@ impl Cpu {
             halted: false,
             stopped: false,
             ime_scheduled: false,
+            halt_bug_pending: false,
         }
     }
 
@@ -44,7 +46,14 @@ impl Cpu {
 
     fn fetch_byte<B: Bus>(&mut self, bus: &mut B) -> Byte {
         let byte = bus.read(self.registers.pc);
-        self.registers.pc = self.registers.pc.wrapping_add(1);
+
+        if self.halt_bug_pending {
+            self.halt_bug_pending = false;
+            trace!("HALT bug : PC non incrémenté après {:#04X}", byte);
+        } else {
+            self.registers.pc = self.registers.pc.wrapping_add(1);
+        }
+
         trace!(
             "Fetched Program Counter: {:#04X}, next Program Counter: {:#04X}",
             byte, self.registers.pc
@@ -69,6 +78,7 @@ impl Cpu {
         self.ime_scheduled = false;
         self.halted = false;
         self.stopped = false;
+        self.halt_bug_pending = false;
     }
 
     pub fn state(&self) -> (&Registers, bool) {
@@ -123,6 +133,7 @@ mod tests {
         assert!(!cpu.halted);
         assert!(!cpu.stopped);
         assert!(!cpu.ime_scheduled);
+        assert!(!cpu.halt_bug_pending);
     }
 
     #[test]

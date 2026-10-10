@@ -1,4 +1,9 @@
-use crate::common::types::{Byte, Cycles};
+use tracing::trace;
+
+use crate::common::{
+    bus::Bus,
+    types::{Byte, Cycles},
+};
 
 use super::Cpu;
 
@@ -11,8 +16,16 @@ pub fn stop(cpu: &mut Cpu) -> Cycles {
     12
 }
 
-pub fn halt(cpu: &mut Cpu) -> Cycles {
-    cpu.halted = true;
+pub fn halt<B: Bus>(cpu: &mut Cpu, bus: &mut B) -> Cycles {
+    let pending = bus.read(0xFFFF) & bus.read(0xFF0F) & 0x1F;
+
+    if !cpu.ime() && pending != 0 {
+        cpu.halt_bug_pending = true;
+        trace!("HALT bug déclenché : IME=false avec interruption en attente");
+    } else {
+        cpu.halted = true;
+    }
+
     4
 }
 
@@ -75,7 +88,14 @@ pub fn rra(cpu: &mut Cpu) -> Cycles {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::cpu::Cpu;
+    use crate::{
+        bus::Bus,
+        common::{
+            bus::Bus as BusTrait,
+            test_helpers::{FlatRam, build_rom},
+        },
+        cpu::Cpu,
+    };
 
     #[test]
     fn nop_does_nothing_but_consumes_cycles() {
@@ -89,7 +109,8 @@ mod tests {
     #[test]
     fn halt_sets_halted_flag() {
         let mut cpu = Cpu::new();
-        let cycles = halt(&mut cpu);
+        let mut bus = Bus::new(build_rom("", 0x00, 0x00, 0x00));
+        let cycles = halt(&mut cpu, &mut bus);
         assert!(cpu.halted);
         assert_eq!(cycles, 4);
     }
@@ -167,5 +188,59 @@ mod tests {
         rra(&mut cpu);
         assert_eq!(cpu.registers.a, 0b1000_0001);
         assert!(!cpu.registers.f.c);
+    }
+
+    #[test]
+    fn halt_sets_halted_flag_when_no_interrupt_pending() {
+        let mut cpu = Cpu::new();
+        let mut bus = FlatRam::new();
+        cpu.set_ime(false);
+        halt(&mut cpu, &mut bus);
+        assert!(cpu.halted);
+        assert!(!cpu.halt_bug_pending);
+    }
+
+    #[test]
+    fn halt_sets_halted_flag_when_ime_true_even_with_pending_interrupt() {
+        let mut cpu = Cpu::new();
+        let mut bus = FlatRam::new();
+        cpu.set_ime(true);
+        bus.write(0xFFFF, 0x01);
+        bus.write(0xFF0F, 0x01);
+
+        halt(&mut cpu, &mut bus);
+
+        assert!(cpu.halted);
+        assert!(!cpu.halt_bug_pending);
+    }
+
+    #[test]
+    fn halt_triggers_bug_when_ime_false_and_interrupt_pending() {
+        let mut cpu = Cpu::new();
+        let mut bus = FlatRam::new();
+        cpu.set_ime(false);
+        bus.write(0xFFFF, 0x01);
+        bus.write(0xFF0F, 0x01);
+        halt(&mut cpu, &mut bus);
+        assert!(!cpu.halted);
+        assert!(cpu.halt_bug_pending);
+    }
+
+    #[test]
+    fn halt_bug_causes_next_byte_to_be_read_twice() {
+        let mut cpu = Cpu::new();
+        let mut bus = FlatRam::new();
+        cpu.registers.pc = 0x0100;
+        bus.write(0x0100, 0x3C);
+        cpu.set_ime(false);
+        bus.write(0xFFFF, 0x01);
+        bus.write(0xFF0F, 0x01);
+        halt(&mut cpu, &mut bus);
+        let first = cpu.fetch_byte(&mut bus);
+        assert_eq!(first, 0x3C);
+        assert_eq!(cpu.registers.pc, 0x0100);
+        let second = cpu.fetch_byte(&mut bus);
+        assert_eq!(second, 0x3C);
+        assert_eq!(cpu.registers.pc, 0x0101);
     }
 }
